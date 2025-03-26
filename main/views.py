@@ -212,9 +212,8 @@ def comic(response, id, inLibrary):
                     import source
                     selectedChapters = response.POST.getlist("checkbox")
                     for chapterId in selectedChapters:
-                        print(chapter.objects.filter(id=chapterId))
                         try:
-                            selectedChapter = chapter.objects.get(**{"id": chapterId})
+                            selectedChapter = chapter.objects.get(id=chapterId)
                             if selectedChapter.downloaded:
                                 selectedChapters.remove(chapterId)
                                 continue
