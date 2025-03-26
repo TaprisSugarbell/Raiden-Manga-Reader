@@ -23,7 +23,7 @@ def updateLibrary():
             updates = []
             for comic in library:
                 if manga.objects.all().filter(id=comic.id).exists():
-                    if comic.updating == False:
+                    if not comic.updating:
                         print(comic.updating)
                         update = updateChapters(comic.id)
                         if len(update) > 0:
@@ -43,12 +43,8 @@ def updateLibrary():
                     )
             if len(updates) == 0:
                 if PLATFORM == "nt":
-                    toast = ToastNotifier()
-                    toast.show_toast(
-                        f'Update Completed',
-                        f"No new chapters are available",
-                        duration=4,
-                    )
+                    print("Update Completed")
+                    print(f"No new chapters are available")
         else:
             if PLATFORM == "nt":
                 toast = ToastNotifier()
@@ -61,7 +57,7 @@ def updateLibrary():
 def updateChapters(comicId):
     if connected():
         comic = manga.objects.get(id=comicId)
-        if comic.editing == True:
+        if comic.editing:
             if PLATFORM == "nt":
                 toast = ToastNotifier()
                 toast.show_toast(
@@ -76,11 +72,10 @@ def updateChapters(comicId):
         ext = extension.objects.get(id=comic.source)
         sys.path.insert(0, ext.path)
         import source
-        print(comic.url)
         newChapters = source.GetChapters(comic.url) # fetches the data for chapters from source
         reversed = newChapters[::-1]
         for currentChapter in chapters:
-            currentChapter.index = -1 # changes the index of all of the current chapters to -1
+            currentChapter.index = -1 # changes the index of all the current chapters to -1
             currentChapter.save()
         for newChapter in newChapters:
             chapter.objects.create(name=newChapter["name"], url=newChapter["url"], comicId=comicId, index=reversed.index(newChapter)+1)
@@ -91,9 +86,9 @@ def updateChapters(comicId):
             filtered = chapter.objects.filter(comicId=comicId, name=newChapter.name).order_by('index')
             if len(filtered) > 1:
                 read, lastRead, downloaded = filtered[0].read, filtered[0].lastRead, filtered[0].downloaded
-                if downloaded == True:
-                    path = f"{os.getcwd()}\main\static\manga\{comicId}\{filtered[0].id}"
-                    newPath = f"{os.getcwd()}\main\static\manga\{comicId}\{filtered[1].id}"
+                if downloaded:
+                    path = fr"{os.getcwd()}\main\static\manga\{comicId}\{filtered[0].id}"
+                    newPath = fr"{os.getcwd()}\main\static\manga\{comicId}\{filtered[1].id}"
                     os.rename(path, newPath)
                 filtered[1].read = read 
                 filtered[1].lastRead = lastRead

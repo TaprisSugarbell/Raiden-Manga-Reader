@@ -3,105 +3,121 @@ var length = images.length;
 var orientation = "left-to-right";
 var layout = null;
 
+// const observer = new IntersectionObserver(entries => {
+//     entries.forEach(entry =>{
+//         if((orientation === "continuous-vertical") || (orientation === "vertical")){
+//             if( (entry.isIntersecting) && (images.indexOf(entry.target) > currentImage) ){
+//                 currentImage = images.indexOf(entry.target);
+//                 console.log(currentImage)
+//                 updateLastRead();
+//                 observer.unobserve(entry.target);
+//             }
+//
+//         }
+//     })
+// },
+// {
+//     rootMargin: "-200px",
+// });
+
+// Reemplaza tu observer actual con este
 const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry =>{
-        if((orientation == "continuous-vertical") || (orientation == "vertical")){
-            if( (entry.isIntersecting) && (images.indexOf(entry.target) > currentImage) ){
-                currentImage = images.indexOf(entry.target);
-                console.log(currentImage)
+    entries.forEach(entry => {
+        if ((orientation === "continuous-vertical" || orientation === "vertical")) {
+            const newIndex = images.indexOf(entry.target);
+
+            // Detectar tanto scroll hacia arriba como hacia abajo
+            if (entry.isIntersecting && newIndex !== currentImage) {
+                currentImage = newIndex;
                 updateLastRead();
-                observer.unobserve(entry.target);
             }
-            
         }
-    })
-},
-{
+    });
+}, {
     rootMargin: "-200px",
+    threshold: 0.3
 });
 
-function trackImages(){
-    if( (orientation == "vertical") || (orientation == "continuous-vertical") ){
+function trackImages() {
+    if ((orientation === "vertical") || (orientation === "continuous-vertical")) {
         images[currentImage].scrollIntoView(false);
     }
-    images.forEach(image =>{
-            observer.observe(image);
-        });
+    images.forEach(image => {
+        observer.observe(image);
+    });
 }
 
 function showSettings() {
     var settings = document.getElementById("settings");
-    if (settings.className == "settings"){
+    if (settings.className === "settings") {
         settings.className = "settings show";
-    } else if (settings.className == "settings show"){
+    } else if (settings.className === "settings show") {
         settings.className = "settings";
     }
 }
 
-document.body.addEventListener('keydown', function(event) {
+document.body.addEventListener('keydown', function (event) {
     const key = event.key;
     switch (key) {
         case "ArrowLeft":
-            if (orientation != "vertical"){
+            if (orientation !== "vertical") {
                 console.log('Left');
-                if (currentImage != 0){
-                    if(layout == "double-page-odd"){
+                if (currentImage !== 0) {
+                    if (layout === "double-page-odd") {
                         console.log("test")
                         images[currentImage].className = "image hide";
-                        if(currentImage > 0){
+                        if (currentImage > 0) {
                             images[currentImage - 1].className = "image hide"
                         }
                         currentImage -= 2;
-                        if(images[currentImage].firstElementChild.naturalWidth <= 1000){
-                            if(currentImage == 0){
+                        if (images[currentImage].firstElementChild.naturalWidth <= 1000) {
+                            if (currentImage === 0) {
                                 images[currentImage].className = "image";
-                            } else{
+                            } else {
                                 images[currentImage].className = "image right";
-                                images[currentImage -1].className = "image left";
+                                images[currentImage - 1].className = "image left";
                                 // currentImage -= 1;
                             }
-                        } else{
+                        } else {
                             images[currentImage].className = "image";
                         }
-                    } else{
+                    } else {
                         images[currentImage].className = "image hide";
                         currentImage -= 1;
                         images[currentImage].className = "image";
                         updateLastRead();
                     }
-                    
+
                 }
             }
             break;
         case "ArrowRight":
-            if (orientation != "vertical"){
+            if (orientation !== "vertical") {
                 console.log('Right');
-                if (currentImage != length-1){
-                    if(layout == "double-page-odd"){
+                if (currentImage !== length - 1) {
+                    if (layout === "double-page-odd") {
                         images[currentImage].className = "image hide";
-                        if(currentImage > 0){
+                        if (currentImage > 0) {
                             images[currentImage - 1].className = "image hide"
                         }
                         currentImage += 1;
-                        if(images[currentImage].firstElementChild.naturalWidth <= 1000){
-                            if(currentImage == length -1){
+                        if (images[currentImage].firstElementChild.naturalWidth <= 1000) {
+                            if (currentImage === length - 1) {
                                 images[currentImage].className = "image";
-                            } else{
-                            images[currentImage].className = "image left";
-                            currentImage += 1;
-                            images[currentImage].className = "image right"
+                            } else {
+                                images[currentImage].className = "image left";
+                                currentImage += 1;
+                                images[currentImage].className = "image right"
                             }
-                        } else{
+                        } else {
                             images[currentImage].className = "image";
                         }
-                    } else{
+                    } else {
                         images[currentImage].className = "image hide";
                         currentImage += 1;
                         images[currentImage].className = "image";
                         updateLastRead();
                     }
-                    
-
                 }
             }
             break;

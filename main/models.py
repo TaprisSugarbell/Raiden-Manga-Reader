@@ -16,7 +16,7 @@ class manga(models.Model):
 	cover = models.TextField(default='', blank=True)
 	description = models.TextField(default=None, blank=True)
 	source = models.IntegerField()
-	author = models.TextField(default="", blank=True)
+	author = models.TextField(default="", blank=True, null=True)
 	orientation = models.TextField(default="left-to-right")
 	numChapters = models.IntegerField(default=0)
 	url = models.TextField(default="")
