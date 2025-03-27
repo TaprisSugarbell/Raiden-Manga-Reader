@@ -2,6 +2,7 @@ from main.Backend.update import autoUpdate, updateOnStart
 from main.Backend.cleanDatabase import checkDatabase
 from main.models import setting
 from django.urls import path
+from django.db.utils import OperationalError
 from . import views
 import threading
 
@@ -20,14 +21,18 @@ urlpatterns = [
 ]
 
 ## urls.py is top level, so startup code can be written here to be executed once
-checkDatabase()
+try:
+    checkDatabase()
+    if setting.objects.get(name="automaticUpdates").state:
+        t = threading.Thread(target=autoUpdate, args=(setting.objects.get(name="automaticUpdates").value,))
+        t.setDaemon = True
+        t.start()
 
-if setting.objects.get(name="automaticUpdates").state == True:
-    t = threading.Thread(target=autoUpdate, args=(setting.objects.get(name="automaticUpdates").value, ))
-    t.setDaemon = True
-    t.start()
-
-else:
-    t = threading.Thread(target=updateOnStart)
-    t.setDaemon = True
-    t.start()
+    else:
+        t = threading.Thread(target=updateOnStart)
+        t.setDaemon = True
+        t.start()
+except OperationalError:
+    print("Database is not initialized")
+except setting.DoesNotExist:
+    print("Settings are not initialized")

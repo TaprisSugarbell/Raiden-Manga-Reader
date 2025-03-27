@@ -15,7 +15,7 @@ def checkDatabase():
             deletedManga.append(comic.title)
             allChapters = chapter.objects.filter(comicId=comic.id)
             for item in allChapters:
-                if item.downloaded == True:
+                if item.downloaded:
                     path = Path.cwd() / "main" / "static" / "manga" / str(comic.id) / str(item.id)
                     if os.path.exists(path):
                         shutil.rmtree(path)
